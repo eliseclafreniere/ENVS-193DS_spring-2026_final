@@ -291,17 +291,22 @@ p_val <- chi_results$p.value
 # displaying values 
 print(chi_stat)
 print(p_val)
+# creating table to show findings
+summary_table <- my_data_clean |> 
+  # creating table structure
+  tabyl(location, productivity_scale) |>  
+  # calculating percentages per row
+  adorn_percentages("row") |>            
+  # calculating percentages per row
+  adorn_pct_formatting(digits = 0) |>      
+  # adding back raw counts
+  adorn_ns()                              
+
+# 3. displaying table
+kable(summary_table, caption = "Table 1. Productivity levels by study location.")
 ```
 
 **Results:**
-
-- $x^2$ = 10.82
-
-- $p$ = 0.01
-
-- $df$ = 3
-
-- $a$ = 0.05
 
 ## d. Create a visualization
 
@@ -326,16 +331,17 @@ ggplot(my_data_clean,
   labs(title = "Figure 2: Distribution of Productivity Levels by Study Location",
        x = "Study Location",
        y = "Count of Observations")
-
-
-
-
-
 ```
-
 
 ## e. Write a caption
 
+**Figure 2: Distribution of Productivity Levels by Study Location.** The x-axis displays study location and the y-axis shows the observed counts of each productivity level. A productivity level of 1 is shown in red, 2 in orange, 3 in yellow, and 4 in green. 
+
 ## f. Write about your results
 
+Based on the observations taken at home (n = 13) and at the library (n = 17) productivity level (on a scale of 1-4) varies significantly based on location ($x^2$(3) = 10.82, $p$ = 0.01, $a$ = 0.05). As shown in Table 1, while a majority of library observations (59%) achieved the highest productivity level (4), the majority of home observations (46%) were concentrated at a lower productivity level of 3. These findings indicate study environment influences reported productivity, with library attendance potentially associated with a one-unit increase on the productivity scale compared to home-based study. 
+
 ## g. Sharing your affective visualization
+
+I attented workshop week 10!
+
