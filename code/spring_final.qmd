@@ -3,6 +3,8 @@ title: "ENVS 193DS Spring Final"
 author: "Elise LaFreniere"
 date: "2026-06-09"
 format: pdf
+warning: FALSE
+message: FALSE
 ---
 
 # Set Up
@@ -18,6 +20,7 @@ library(DHARMa)
 library(here)
 library(MuMIn)
 library(ggeffects)
+library(knitr)
 # reading in nest data 
 nest <- read.csv(here("data/nest_data_final.csv"))
 # reading in my personal data
@@ -91,7 +94,7 @@ The 1s and 0s in this dataset, specifically seen in the case_control column, sig
 ## d. Table of models
 
 | Model Number | Predictors Present | Interaction Term? | Description |
-| :--- | :--- | :--- | :--- |
+|:-----------------|:-----------------|:-----------------|:-----------------|
 | **Model 1** | Tree height, Ant species | No | Examines the independent main effects of tree height and ant species on the probability of nest occurrence. |
 | **Model 2** | Tree height, Ant species | Yes | Examines whether the effect of tree height on the probability of nest occurrence depends on the specific ant species present. |
 
@@ -141,8 +144,8 @@ simulated_res <- simulateResiduals(fittedModel = model2)
 plot(simulated_res)
 ```
 
-- **QQ Plot Residuals:** Points largely follow the reference line, indicating normality of residuals. 
-- **Residuals vs. Predicted:** The points appear randomly distributed without a distinct pattern, and the quantile lines are relatively flat, indicating the model fits the data.
+-   **QQ Plot Residuals:** Points largely follow the reference line, indicating normality of residuals.
+-   **Residuals vs. Predicted:** The points appear randomly distributed without a distinct pattern, and the quantile lines are relatively flat, indicating the model fits the data.
 
 ## h. Visualize the model predictions
 
@@ -200,7 +203,7 @@ ggplot(mapping = aes(x = height_m, # x-axis height
 
 ## i. Write a caption for your figure
 
-**Figure 1: Probability of nest occurrence in relation to tree height and ant species.** This plot shows the probability of nest occurrence for three bird species (gray-headed sparrow, gray-capped social weaver, superb starling) across varying tree heights (m) faceted by ant species (*C. sjostedti, C. mimosae, and C. nigriceps*). The solid lines depict mean model predictions, with the shaded ribbons around the lines showing  95% confidence intervals. The open circles represent individual observations (1 = nest present, 0 = nest absent). Colors correspond to the ant species present at the tree: *C. sjostedti* (pink), *C. mimosae* (green), and *C. nigriceps* (blue). **Data source:** Lujan, E., Nielsen, R., Short, Z., Wicks, S., Nderitu Watetu, W., Malingati Khasoha, L., Palmer, T. M., Goheen, J. R., & Alston, J. M. (2023). Data, code, and metadata for: Symbiotic acacia ants drive nesting behavior by birds in an African savanna [Data set]. Zenodo. https://doi.org/10.5281/zenodo.8373322
+**Figure 1: Probability of nest occurrence in relation to tree height and ant species.** This plot shows the probability of nest occurrence for three bird species (gray-headed sparrow, gray-capped social weaver, superb starling) across varying tree heights (m) faceted by ant species (*C. sjostedti, C. mimosae, and C. nigriceps*). The solid lines depict mean model predictions, with the shaded ribbons around the lines showing 95% confidence intervals. The open circles represent individual observations (1 = nest present, 0 = nest absent). Colors correspond to the ant species present at the tree: *C. sjostedti* (pink), *C. mimosae* (green), and *C. nigriceps* (blue). **Data source:** Lujan, E., Nielsen, R., Short, Z., Wicks, S., Nderitu Watetu, W., Malingati Khasoha, L., Palmer, T. M., Goheen, J. R., & Alston, J. M. (2023). Data, code, and metadata for: Symbiotic acacia ants drive nesting behavior by birds in an African savanna \[Data set\]. Zenodo. https://doi.org/10.5281/zenodo.8373322
 
 ## j. Calculate model predictions
 
@@ -217,6 +220,122 @@ print(preds_6m)
 
 As shown in **Figure 1**, the probability of bird nest occurrence increases significantly with tree height for trees inhabited by the aggressive ant species *C. mimosae* and *C. nigriceps*, reaching a predicted probability of 0.74 and 1.00 respectively at a height of 6 m. In contrast, the probability remains low (0.20) for trees occupied by the less aggressive ant species, *C. sjostedti*, highlighting a clear preference for trees defended by more aggressive ant symbionts. This pattern aligns with the study’s findings that birds prioritize nesting in trees defended by aggressive ants to potentially reduce nest predation risk. Furthermore, the stronger association seen with *C. nigriceps* may be due to the species' tendency to prune apical buds, creating a denser more concealed canopy that provides birds with additional physical protection from predators.
 
+# Problem 3. Affective and exploratory visualizations
+
+**Homework 2 Visualization**
+
+![](images/clipboard-73577020.png){width="282"}
+
+**Affective Visualization**
+
+![](images/clipboard-4244499014.png){width="253"}
+
+## a. Comparing visualization
+
+-   The visualizations differ in the amount of data visualized and the style in which they are shown. My affective visualization displays the data in a more artistic way with the underlying box plot being shown more abstractly. This contrasts the more standard formatting of my boxplot seen in my homework two exploratory visualization.
+-   Both visualizations are based on a boxplot format with productivity on the y-axis and the location shown on the x-axis.
+-   Both visualizations show the library productivity median bar being higher than the home productivity median. The homework 2 boxplot is less developed as less data was taken at that point in time, where the affective visualization displays more data through the pigeons and seagulls as individual observations. The relationships seen are overall the same between the visualizations with more expanded data and a lower IQR for the library data seen in the affective visualization. This shows that my productivity levels remained similar as more data was taken.
+-   During week 9 I received feedback in workshop that the concept to show my visualization made sense, was personal, and fun! My peers liked my bird concept and the colors I utilized in my data. I was given feedback to thicken my actual "bars" within the visualization. Additionally based on feedback I decided to include the home and library labels as spray paint on the sidewalk to make the visualization more clear.
+
+## b. Designing an analysis
+
+**My Question:** Does location impact my productivity level?
+
+**Variables:** Location (categorical, predictor), Productivity (ordinal, response)
+
+**Analysis:** I will run a chi-square test to analyse my research question. This analysis fits my research question in how it will allow me to compare counts between group to identify if there is a relationship between my variables. A limitation to this model is that it will treat my productivity level as a categorical group instead of ordinal and will therefore look at the frequency count of each productivity level.
+
+## c. Check any assumptions and run your analysis
+
+### Cleaning data
+
+```{r}
+# creating a new object for clean data
+my_data_clean <- my_data |> 
+  # cleaning names
+  clean_names() |> 
+  # selecting desired columns 
+  select (location, productivity_scale)
+```
+
+### Creating Observered and Expected Contingency Tables
+
+```{r}
+#| warning: false
+# creating observed table object 
+observed_table <- table(my_data_clean$location, 
+                        my_data_clean$productivity_scale)
+# performing chi-squared test to see expected values
+chi_results <- chisq.test(observed_table)
+# display observed table
+print("Observed:")
+print(observed_table)
+# display expected table
+print("Expected:")
+print(chi_results$expected)
+```
+
+### Checking assumptions:
+
+-   **Independent Variables:** The observations are independent because each data point represents a discrete study session recorded on distinct dates and times. By temporally separating each observation, I ensured that the productivity score of one session did not influence the outcome of subsequent sessions.
+-   **Categorical Data (frequencies)** The Chi-squared test requires data to be represented as counts (frequencies) rather than continuous values. My data meets this requirement through a contingency table where each each row and column are categories (location or productivity) and each cell is a combination of those two categories.
+-   **Expected Values:** Upon generating the expected values contingency table, not all cell values were a value greater than the 5 (general rule-of-thumb value). I will still proceed to utilize the chi-square test of independence while acknowledging that the smaller sample size may impact my results.
+
+### Running Analysis
+
+```{r}
+# creating object to calculate chi-squared test statistic 
+chi_stat <- chi_results$statistic
+# creating object to calculate p value
+p_val <- chi_results$p.value
+# displaying values 
+print(chi_stat)
+print(p_val)
+```
+
+**Results:**
+
+- $x^2$ = 10.82
+
+- $p$ = 0.01
+
+- $df$ = 3
+
+- $a$ = 0.05
+
+## d. Create a visualization
+
+```{r}
+# base: ggplot
+ggplot(my_data_clean,
+       mapping = aes(x = location, # x-axis location
+                     fill = as.factor(productivity_scale))) + # fill by productivity
+  # first layer: geom_bar
+  geom_bar(position = "dodge", 
+           color = "black") +
+  # adding custom colors
+  scale_fill_manual(values = c("1" = "darkred",   
+                               "2" = "sienna3",   
+                               "3" = "khaki2",   
+                               "4" = "olivedrab")) + 
+  # custom theme 
+  theme_minimal() +
+  # removing legend position
+  theme(legend.position = "none") +
+  
+  labs(title = "Figure 2: Distribution of Productivity Levels by Study Location",
+       x = "Study Location",
+       y = "Count of Observations")
 
 
 
+
+
+```
+
+
+## e. Write a caption
+
+## f. Write about your results
+
+## g. Sharing your affective visualization
