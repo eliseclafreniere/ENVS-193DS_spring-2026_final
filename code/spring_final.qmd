@@ -1,18 +1,109 @@
 ---
-title: "spring_final"
-format: html
+title: "ENVS 193DS Spring Final"
+author: "Elise LaFreniere"
+date: "2026-06-09"
+format: pdf
 ---
-# Reading in Packages / Data 
+# Set Up
+
 ```{r}
 #| label: packages-data
+#| message: false
+#| warning: false
 # reading in packages
 library(tidyverse)
 library(janitor)
 library(DHARMa)
+library(here)
 
 # reading in nest data 
-nest <- read.csv("data/nest_data_final.csv") 
+nest <- read.csv(here("data/nest_data_final.csv"))
 # reading in my personal data
-my_data <- read.csv("data/personal_data.csv") 
+my_data <- read.csv(here("data/personal_data.csv")) 
 ```
+
+# Problem 1. Research writing 
+
+## a. Transparent statistical methods 
+
+In part one my co-workers are using a generalized linear model test. This is seen through the response variable, whether the American Avocet utilized the habitat (San Francisco Bay), being binary data (yes or no). Additionally the binary response variable is being linked to a continuous variable, the distance from the water edge, further signalling the use of a generalized linear model.
+
+In part two my co-workers are using a chi-squared test. This is seen through the analysis testing whether there is a relationship between two categorical variables: bird species and habitat. 
+
+## b. Suggestions for rewriting 
+
+- **Part 1:** The data indicates that the distance to the water's edge significantly influences whether American Avocets utilizes a particular microhabitat. This means an avocet's likelihood of occupying an area changes predictably depending on how close or far the area is from the edge of the water. 
+- **Part 2:** We found clear evidence that different shorebird species (American Avocet, Forter's Tern, Black-necked Stilt) prefer distinct types of habitats (managed pond, non-tidal marsh, salt pond, tidal marsh, or tidal mudflat) over others in the San Francisco Bay.
+
+## c. Further analysis 
+- **Additional Variable:** An additional variable that could influence American Avocet microhabitat use is water depth.
+- **Variable Type:** Water depth is a continuous variable that can be measured in centimeters (cm). 
+- **Why?:** Water depth may influence habitat use because American Avovets are wading shorebirds that require shallow water to effectively find food. Due to this, analyzing water depth could compliment the distance to water edge data and provide a more comprehensive understanding to the specific ecosystem conditions that impact shorebird habitat use. 
+
+# Problem 2. Data analysis
+
+## a. Clean and wrangle 
+
+```{r}
+#| label: cleaning-data
+# creating clean object 
+nests_clean <- nest |>  
+  # cleaning names
+  clean_names() |>  
+  # selecting for desired columns
+  select(height_cm, 
+         case_control, 
+         ant_species) |>  
+  # filtering for multiple values using %in%
+  filter(ant_species %in% c("AB", "RRB", "BBR")) |>  
+  # full scientific names in new column
+  mutate(species_name = fct_recode(as.factor(ant_species),
+    "C. sjostedti" = "AB",
+    "C. mimosae"   = "RRB",
+    "C. nigriceps"  = "BBR"
+  )) |>  
+  # reordering columns in desired order
+  mutate(species_name = fct_relevel(species_name,
+                                    "C. sjostedti",
+                                    "C. mimosae",
+                                    "C. nigriceps")) |> 
+  # arranging by species_name
+  arrange(species_name)
+# displaying 10 random rows  
+slice_sample(nests_clean, n = 10)
+```
+
+
+
+
+
+## b. Response variable
+
+## c. Purpose of study 
+
+## d. Table of models 
+
+## e. Run the models 
+
+## Select the best model
+
+## g. Check the diagnostics 
+
+## h. Visualize the model predictions 
+
+## i. Write a caption for your figure 
+
+## j. Calculate model predictions
+
+## k. Interpret your results 
+
+
+
+
+
+
+
+
+
+
 
