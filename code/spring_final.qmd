@@ -131,6 +131,10 @@ The best model as determined by Akaike’s Information Criterion (AIC) included 
 ## g. Check the diagnostics
 
 ```{r}
+#| fig-width: 10
+#| fig-height: 4
+#| fig-dpi: 300
+#| out-width: "100%"
 # checking diagnostics with DHARMa package
 simulated_res <- simulateResiduals(fittedModel = model2)
 # plot the DHARMa diagnostics
@@ -143,6 +147,10 @@ plot(simulated_res)
 ## h. Visualize the model predictions
 
 ```{r}
+#| fig-width: 10
+#| fig-height: 4
+#| fig-dpi: 300
+#| out-width: "100%"
 # defining colors 
 my_ant_colors <- c(
   "C. sjostedti" = "orchid3",
@@ -197,11 +205,12 @@ ggplot(mapping = aes(x = height_m, # x-axis height
 ## j. Calculate model predictions
 
 ```{r}
-predictions_at_6m <- ggpredict(model2, 
-                               terms = c("height_m [6]", "species_name"))
-
-# This output will show you exactly the probability for 6m for all three species
-print(predictions_at_6m)
+# creating object to store 600 cm prediction 
+# writing as 6m to match study units more
+preds_6m <- ggpredict(model2, 
+                      terms = c("height_m [6]", "species_name"))
+# displaying ouput
+print(preds_6m)
 ```
 
 ## k. Interpret your results
