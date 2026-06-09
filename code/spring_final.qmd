@@ -4,6 +4,7 @@ author: "Elise LaFreniere"
 date: "2026-06-09"
 format: pdf
 ---
+
 # Set Up
 
 ```{r}
@@ -15,34 +16,36 @@ library(tidyverse)
 library(janitor)
 library(DHARMa)
 library(here)
-
+library(MuMIn)
+library(ggeffects)
 # reading in nest data 
 nest <- read.csv(here("data/nest_data_final.csv"))
 # reading in my personal data
 my_data <- read.csv(here("data/personal_data.csv")) 
 ```
 
-# Problem 1. Research writing 
+# Problem 1. Research writing
 
-## a. Transparent statistical methods 
+## a. Transparent statistical methods
 
 In part one my co-workers are using a generalized linear model test. This is seen through the response variable, whether the American Avocet utilized the habitat (San Francisco Bay), being binary data (yes or no). Additionally the binary response variable is being linked to a continuous variable, the distance from the water edge, further signalling the use of a generalized linear model.
 
-In part two my co-workers are using a chi-squared test. This is seen through the analysis testing whether there is a relationship between two categorical variables: bird species and habitat. 
+In part two my co-workers are using a chi-squared test. This is seen through the analysis testing whether there is a relationship between two categorical variables: bird species and habitat.
 
-## b. Suggestions for rewriting 
+## b. Suggestions for rewriting
 
-- **Part 1:** The data indicates that the distance to the water's edge significantly influences whether American Avocets utilizes a particular microhabitat. This means an avocet's likelihood of occupying an area changes predictably depending on how close or far the area is from the edge of the water. 
-- **Part 2:** We found clear evidence that different shorebird species (American Avocet, Forter's Tern, Black-necked Stilt) prefer distinct types of habitats (managed pond, non-tidal marsh, salt pond, tidal marsh, or tidal mudflat) over others in the San Francisco Bay.
+-   **Part 1:** The data indicates that the distance to the water's edge significantly influences whether American Avocets utilizes a particular microhabitat. This means an avocet's likelihood of occupying an area changes predictably depending on how close or far the area is from the edge of the water.
+-   **Part 2:** We found clear evidence that different shorebird species (American Avocet, Forter's Tern, Black-necked Stilt) prefer distinct types of habitats (managed pond, non-tidal marsh, salt pond, tidal marsh, or tidal mudflat) over others in the San Francisco Bay.
 
-## c. Further analysis 
-- **Additional Variable:** An additional variable that could influence American Avocet microhabitat use is water depth.
-- **Variable Type:** Water depth is a continuous variable that can be measured in centimeters (cm). 
-- **Why?:** Water depth may influence habitat use because American Avovets are wading shorebirds that require shallow water to effectively find food. Due to this, analyzing water depth could compliment the distance to water edge data and provide a more comprehensive understanding to the specific ecosystem conditions that impact shorebird habitat use. 
+## c. Further analysis
+
+-   **Additional Variable:** An additional variable that could influence American Avocet microhabitat use is water depth.
+-   **Variable Type:** Water depth is a continuous variable that can be measured in centimeters (cm).
+-   **Why?:** Water depth may influence habitat use because American Avovets are wading shorebirds that require shallow water to effectively find food. Due to this, analyzing water depth could compliment the distance to water edge data and provide a more comprehensive understanding to the specific ecosystem conditions that impact shorebird habitat use.
 
 # Problem 2. Data analysis
 
-## a. Clean and wrangle 
+## a. Clean and wrangle
 
 ```{r}
 #| label: cleaning-data
@@ -73,37 +76,108 @@ nests_clean <- nest |>
 slice_sample(nests_clean, n = 10)
 ```
 
-
-
-
-
 ## b. Response variable
 
-## c. Purpose of study 
+The 1s and 0s in this dataset, specifically seen in the case_control column, signal whether a whistling thorn tree has a bird nest. A 1 represents the presenece of a bird nest, therefore signalling the tree as 'used', and a 0 represents the absence of a bird nest, therefore signalling the tree as 'available'.
 
-## d. Table of models 
+## c. Purpose of study
 
-## e. Run the models 
+**Tree Height (cm):** Tree height is a continuous variable measured in meters (m). As tree height increases the probability of nest occurrence would increases likely due to increased protection from predators (being higher off the ground) and structural advantages to taller trees (such as increased support). The relationship between tree height and nesting was found in the results section, paragraph one. Reasoning for why this may be helpful was inferred by me based on common biological strategies.
 
-## Select the best model
+**Acacia Ant Species:** Acacia ant species is a categorical variable that represents distinct nonnumerical groups based on the identity of the ant symbiont occupying the tree. As the presence of aggressive ant species (C. mimosae or C. nigriceps) increases, the probability of nest occurrence would increase because these specific ants defend the host trees against predators without attacking the birds or their nestlings. Conversely, trees occupied by less aggressive ants (C. sjostedti or T. penzigi) or no ants at all would see a decrease in the probability of nest occurrence because they offer minimal protection from nest predation. I found this information from the results section in paragraph 3 and the discussion section in paragraph 1.
 
-## g. Check the diagnostics 
+## d. Table of models
 
-## h. Visualize the model predictions 
+| Model Number | Predictors Present | Interaction Term? | Description |
+| :--- | :--- | :--- | :--- |
+| **Model 1** | Tree height, Ant species | No | Examines the independent main effects of tree height and ant species on the probability of nest occurrence. |
+| **Model 2** | Tree height, Ant species | Yes | Examines whether the effect of tree height on the probability of nest occurrence depends on the specific ant species present. |
 
-## i. Write a caption for your figure 
+## e. Run the models
+
+```{r}
+#| label: run-model
+#| include: false
+# model 1: no interaction
+model1 <- glm(
+  case_control ~ height_cm + species_name, 
+  data = nests_clean, 
+  family = binomial
+)
+# model 2: interaction
+model2 <- glm(
+  case_control ~ height_cm * species_name, 
+  data = nests_clean, 
+  family = binomial
+)
+```
+
+## f. Select the best model
+
+```{r}
+# calculating AIC from models
+AICc(
+  model1, 
+  model2
+) |> 
+  # rearranged to lowest to highest values
+  arrange(AICc)
+```
+
+The best model as determined by Akaike’s Information Criterion (AIC) included the effects of tree height and acacia ant species, as well as the interaction between the two, to predict the probability of nest occurrence.
+
+## g. Check the diagnostics
+
+```{r}
+# checking diagnostics with DHARMa package
+simulated_res <- simulateResiduals(fittedModel = model2)
+# plot the DHARMa diagnostics
+plot(simulated_res)
+```
+
+- **QQ Plot Residuals:** Points largely follow the reference line, indicating normality of residuals. 
+- **Residuals vs. Predicted:** The points appear randomly distributed without a distinct pattern, and the quantile lines are relatively flat, indicating the model fits the data.
+
+## h. Visualize the model predictions
+
+```{r}
+# Define your colors (use hex codes for precision)
+my_ant_colors <- c(
+  "C. sjostedti" = "orchid3",
+  "C. mimosae"   = "palegreen4",
+  "C. nigriceps" = "skyblue2"
+)
+preds <- ggpredict(model2, terms = c("height_cm", "species_name"))
+colnames(preds)[colnames(preds) == "group"] <- "species_name"
+
+ggplot(mapping = aes(x = height_cm,
+                     y = case_control)) +
+  geom_jitter(data = nests_clean,
+              aes(color = species_name), 
+              height = 0.05, 
+              width = 0.2, 
+              shape = 21, 
+              alpha = 0.4) +
+  geom_line(data = preds, mapping = aes(x = x,
+                                        y = predicted,
+                                        color = species_name)) +
+  geom_ribbon(data = preds, mapping = aes(x = x,
+                                          y = predicted, 
+                                          ymin = conf.low, 
+                                          ymax = conf.high, 
+                                          fill = species_name), 
+              alpha = 0.1, 
+              color = NA) +
+  scale_color_manual(values = my_ant_colors) +
+  scale_fill_manual(values = my_ant_colors) +
+  facet_wrap(~ species_name) +
+  theme_classic() +
+  theme(legend.position = "none") +
+  labs(x = "Tree Height (m)", y = "Probability of Nest Occurrence")
+```
+
+## i. Write a caption for your figure
 
 ## j. Calculate model predictions
 
-## k. Interpret your results 
-
-
-
-
-
-
-
-
-
-
-
+## k. Interpret your results
