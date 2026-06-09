@@ -1,0 +1,18 @@
+---
+title: "spring_final"
+format: html
+---
+# Reading in Packages / Data 
+```{r}
+#| label: packages-data
+# reading in packages
+library(tidyverse)
+library(janitor)
+library(DHARMa)
+
+# reading in nest data 
+nest <- read.csv("data/nest_data_final.csv") 
+# reading in my personal data
+my_data <- read.csv("data/personal_data.csv") 
+```
+

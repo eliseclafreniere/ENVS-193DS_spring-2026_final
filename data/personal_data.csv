@@ -1,0 +1,31 @@
+Date (yyyy-mm-dd),Productivity scale ,Others present? ,Weather ,Duration (minutes),Breaks (minutes),Productivity (%),Location ,Mood 
+2026-04-22,4,yes,sunny,60,5,92,library ,normal
+2026-04-23,2,no,sunny,90,40,56,home,good
+2026-04-27,3,no,sunny,90,20,78,home,normal
+2026-04-27,1,yes,sunny,60,30,50,home,stressed
+2026-04-27,3,yes,cloudy,60,15,75,home,stressed
+2026-04-28,3,no,sunny,80,30,75,home,normal
+2026-04-29,4,yes,sunny,90,10,89,library ,normal
+2026-04-29,3,yes,cloudy,60,10,83,home,normal
+2026-04-30,3,no,sunny,120,20,83,library ,stressed
+2026-05-03,3,yes,cloudy,90,20,78,library ,normal
+2026-05-04,4,yes,sunny,60,5,92,library ,normal
+2026-05-05,2,no,sunny,90,35,61,home,stressed
+2026-05-06,4,yes,sunny,120,15,88,library ,normal
+2026-05-07,2,no,sunny,60,10,65,home,normal
+2026-05-08,3,yes,sunny,90,15,83,library ,good
+2026-05-10,2,yes,cloudy,60,15,58,home,normal
+2026-05-11,4,no,cloudy,80,10,88,library ,normal
+2026-05-11,4,yes,sunny,120,10,92,library ,good
+2026-05-12,4,yes,sunny,115,18,84,library ,normal
+2026-05-14,4,yes,sunny,41,5,88,home,stressed
+2026-05-18,4,no,sunny,90,10,89,library ,normal
+2026-05-19,1,no,sunny,60,30,50,home,stressed
+2026-05-20,4,yes,sunny,90,10,89,library ,good
+2026-05-21,3,no,sunny,90,20,78,home,stressed
+2026-05-22,4,yes,sunny,60,5,93,library ,normal
+2026-05-23,3,yes,sunny,120,35,71,library ,normal
+2026-05-24,3,no,sunny,90,25,72,home,stressed
+2026-05-25,3,yes,sunny,60,10,83,library ,normal
+2026-05-26,2,yes,cloudy,60,15,58,library ,stressed
+2026-05-26,3,no,cloudy,90,15,83,library ,stressed
