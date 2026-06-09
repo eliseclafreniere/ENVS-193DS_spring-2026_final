@@ -53,8 +53,10 @@ In part two my co-workers are using a chi-squared test. This is seen through the
 nests_clean <- nest |>  
   # cleaning names
   clean_names() |>  
+  # changing height_cm to be in meters
+  mutate(height_m = height_cm / 100) |> 
   # selecting for desired columns
-  select(height_cm, 
+  select(height_m, 
          case_control, 
          ant_species) |>  
   # filtering for multiple values using %in%
@@ -82,7 +84,7 @@ The 1s and 0s in this dataset, specifically seen in the case_control column, sig
 
 ## c. Purpose of study
 
-**Tree Height (cm):** Tree height is a continuous variable measured in meters (m). As tree height increases the probability of nest occurrence would increases likely due to increased protection from predators (being higher off the ground) and structural advantages to taller trees (such as increased support). The relationship between tree height and nesting was found in the results section, paragraph one. Reasoning for why this may be helpful was inferred by me based on common biological strategies.
+**Tree Height (m):** Tree height is a continuous variable measured in meters (m). As tree height increases the probability of nest occurrence would increases likely due to increased protection from predators (being higher off the ground) and structural advantages to taller trees (such as increased support). The relationship between tree height and nesting was found in the results section, paragraph one. Reasoning for why this may be helpful was inferred by me based on common biological strategies.
 
 **Acacia Ant Species:** Acacia ant species is a categorical variable that represents distinct nonnumerical groups based on the identity of the ant symbiont occupying the tree. As the presence of aggressive ant species (C. mimosae or C. nigriceps) increases, the probability of nest occurrence would increase because these specific ants defend the host trees against predators without attacking the birds or their nestlings. Conversely, trees occupied by less aggressive ants (C. sjostedti or T. penzigi) or no ants at all would see a decrease in the probability of nest occurrence because they offer minimal protection from nest predation. I found this information from the results section in paragraph 3 and the discussion section in paragraph 1.
 
@@ -100,13 +102,13 @@ The 1s and 0s in this dataset, specifically seen in the case_control column, sig
 #| include: false
 # model 1: no interaction
 model1 <- glm(
-  case_control ~ height_cm + species_name, 
+  case_control ~ height_m + species_name, 
   data = nests_clean, 
   family = binomial
 )
 # model 2: interaction
 model2 <- glm(
-  case_control ~ height_cm * species_name, 
+  case_control ~ height_m * species_name, 
   data = nests_clean, 
   family = binomial
 )
@@ -141,26 +143,31 @@ plot(simulated_res)
 ## h. Visualize the model predictions
 
 ```{r}
-# Define your colors (use hex codes for precision)
+# defining colors 
 my_ant_colors <- c(
   "C. sjostedti" = "orchid3",
   "C. mimosae"   = "palegreen4",
   "C. nigriceps" = "skyblue2"
 )
-preds <- ggpredict(model2, terms = c("height_cm", "species_name"))
+# creating object, preds, to store model predictions
+preds <- ggpredict(model2, terms = c("height_m", "species_name"))
+# changing the preds "group" column name to "species_name"
 colnames(preds)[colnames(preds) == "group"] <- "species_name"
-
-ggplot(mapping = aes(x = height_cm,
-                     y = case_control)) +
+# base layer: ggplot
+ggplot(mapping = aes(x = height_m, # x-axis height
+                     y = case_control)) + # y-axis probability
+  # first layer: geom_jitter
   geom_jitter(data = nests_clean,
-              aes(color = species_name), 
+              aes(color = species_name), # coloring by species name
               height = 0.05, 
               width = 0.2, 
               shape = 21, 
               alpha = 0.4) +
+  # second layer: geom_line on preds data
   geom_line(data = preds, mapping = aes(x = x,
-                                        y = predicted,
+                                        y = predicted, 
                                         color = species_name)) +
+  # third layer: geom_ribbon to show 95% CI
   geom_ribbon(data = preds, mapping = aes(x = x,
                                           y = predicted, 
                                           ymin = conf.low, 
@@ -168,16 +175,39 @@ ggplot(mapping = aes(x = height_cm,
                                           fill = species_name), 
               alpha = 0.1, 
               color = NA) +
+  # making colors match my_ant_colors
   scale_color_manual(values = my_ant_colors) +
   scale_fill_manual(values = my_ant_colors) +
+  # faceting by species name
   facet_wrap(~ species_name) +
+  # adding a theme
   theme_classic() +
+  # removing legend
   theme(legend.position = "none") +
-  labs(x = "Tree Height (m)", y = "Probability of Nest Occurrence")
+  # adding axes titles and a title for figure
+  labs(x = "Tree Height (m)", 
+       y = "Probability of Nest Occurrence",
+       title = "Figure 1: Probability of nest occurence in relation to tree height and ant species")
 ```
 
 ## i. Write a caption for your figure
 
+**Figure 1: Probability of nest occurrence in relation to tree height and ant species.** This plot shows the probability of nest occurrence for three bird species (gray-headed sparrow, gray-capped social weaver, superb starling) across varying tree heights (m) faceted by ant species (*C. sjostedti, C. mimosae, and C. nigriceps*). The solid lines depict mean model predictions, with the shaded ribbons around the lines showing  95% confidence intervals. The open circles represent individual observations (1 = nest present, 0 = nest absent). Colors correspond to the ant species present at the tree: *C. sjostedti* (pink), *C. mimosae* (green), and *C. nigriceps* (blue). **Data source:** Lujan, E., Nielsen, R., Short, Z., Wicks, S., Nderitu Watetu, W., Malingati Khasoha, L., Palmer, T. M., Goheen, J. R., & Alston, J. M. (2023). Data, code, and metadata for: Symbiotic acacia ants drive nesting behavior by birds in an African savanna [Data set]. Zenodo. https://doi.org/10.5281/zenodo.8373322
+
 ## j. Calculate model predictions
 
+```{r}
+predictions_at_6m <- ggpredict(model2, 
+                               terms = c("height_m [6]", "species_name"))
+
+# This output will show you exactly the probability for 6m for all three species
+print(predictions_at_6m)
+```
+
 ## k. Interpret your results
+
+As shown in **Figure 1**, the probability of bird nest occurrence increases significantly with tree height for trees inhabited by the aggressive ant species *C. mimosae* and *C. nigriceps*, reaching a predicted probability of 0.74 and 1.00 respectively at a height of 6 m. In contrast, the probability remains low (0.20) for trees occupied by the less aggressive ant species, *C. sjostedti*, highlighting a clear preference for trees defended by more aggressive ant symbionts. This pattern aligns with the study’s findings that birds prioritize nesting in trees defended by aggressive ants to potentially reduce nest predation risk. Furthermore, the stronger association seen with *C. nigriceps* may be due to the species' tendency to prune apical buds, creating a denser more concealed canopy that provides birds with additional physical protection from predators.
+
+
+
+
