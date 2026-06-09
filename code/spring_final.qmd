@@ -5,6 +5,7 @@ date: "2026-06-09"
 format: pdf
 warning: FALSE
 message: FALSE
+toc: true
 ---
 
 # Set Up
