@@ -179,11 +179,12 @@ ggplot(mapping = aes(x = height_m, # x-axis height
                                         y = predicted, 
                                         color = species_name)) +
   # third layer: geom_ribbon to show 95% CI
-  geom_ribbon(data = preds, mapping = aes(x = x,
-                                          y = predicted, 
-                                          ymin = conf.low, 
-                                          ymax = conf.high, 
-                                          fill = species_name), 
+  geom_ribbon(data = preds, 
+              mapping = aes(x = x,
+                            y = predicted, 
+                            ymin = conf.low, 
+                            ymax = conf.high, 
+                            fill = species_name), 
               alpha = 0.1, 
               color = NA) +
   # making colors match my_ant_colors
@@ -306,8 +307,6 @@ summary_table <- my_data_clean |>
 kable(summary_table, caption = "Table 1. Productivity levels by study location.")
 ```
 
-**Results:**
-
 ## d. Create a visualization
 
 ```{r}
@@ -327,7 +326,7 @@ ggplot(my_data_clean,
   theme_minimal() +
   # removing legend position
   theme(legend.position = "none") +
-  
+  # creating a title for figure, labeling axes
   labs(title = "Figure 2: Distribution of Productivity Levels by Study Location",
        x = "Study Location",
        y = "Count of Observations")
